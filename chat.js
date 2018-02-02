@@ -1,13 +1,19 @@
-const express = require('express');
-const app = express();
+const app = require('express')();
+const server = require('http').Server(app);
+const io = require('socket.io')(server);
 
-app.use(express.static('public'));
 app.get('/',(req,res) => {
-    res.send('hello world');
+    res.sendFile(__dirname + '/index.html');
 });
 
-app.post('/',(req,res) => {
-    res.send('post');
+io.on('connection', (socket) => { 
+    socket.on('chat', (msg) => {
+        io.emit('chat', msg);
+    });
 });
 
-app.listen(process.env.PORT ||3000);
+server.on('listening',()=>{
+    console.log('listen'); 
+});
+
+server.listen(process.env.PORT ||3000);
